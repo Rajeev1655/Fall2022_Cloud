@@ -1,14 +1,26 @@
 import json
+import boto3
+import logging
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+#obtain the lex client using boto3
+client = boto3.client('lex-runtime')
+#post the bot response to the front end 
 def lambda_handler(event, context):
-    botMessage="Application under development. Search functionality will be implemented in Assignment 2"
+    response = client.post_text(
+        botName='DiningBot',
+        botAlias='prod',
+        userId='User0',
+        inputText=event['messages'][0]['unstructured']['text']
+        )
     botResponse =  [{
         'type': 'unstructured',
         'unstructured': {
-          'text': botMessage
-        }
-      }]
+          'text': response["message"]
+        }}]
     return {
         'statusCode': 200,
         'messages': botResponse
-    }
+        }
